@@ -1,0 +1,39 @@
+# Version Control
+.git
+.gitignore
+.dockerignore
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/.mypy_cache
+**/.venv
+**/venv
+**/env
+
+# Node.js
+**/node_modules
+**/npm-debug.log
+**/dist
+**/build
+
+# Environment & Config
+.env
+**/.env
+.DS_Store
+
+# Documentation
+README.md
+walkthrough.md
+task.md
+implementation_plan.md
+
+# IDEs
+.idea
+.vscode
+
+# Certificates (Don't build secrets into images unless necessary)
+nginx/certs

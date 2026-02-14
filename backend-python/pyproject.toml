@@ -1,0 +1,20 @@
+[project]
+name = "devpulse-backend"
+version = "0.1.0"
+description = "DevPulse Backend"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "redis",
+    "scrapy",
+    "selenium",
+    "pandas",
+    "numpy",
+    "requests",
+    "beautifulsoup4",
+    "python-multipart",
+    "crochet",
+]
+
+[tool.uv]

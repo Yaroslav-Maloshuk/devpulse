@@ -1,0 +1,78 @@
+services:
+  backend-python:
+    build: ./backend-python
+    container_name: devpulse-python
+    # Internal port 8000, not exposed to host to avoid conflict if nginx uses it
+    # ports:
+    #   - "8000:8000" 
+    # Exposed on 8001 just for debug if needed
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend-python:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SELENIUM_HOST=selenium-hub
+    depends_on:
+      - redis
+      - selenium-hub
+    # Keep container running even if main process exits, for development
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  backend-node:
+    build: ./backend-node
+    container_name: devpulse-node
+    # Internal only, accessed via Nginx
+    # ports:
+    #   - "3000:3000"
+    volumes:
+      - ./backend-node:/app
+      - /app/node_modules
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    command: npm run dev
+
+  frontend:
+    build: ./frontend
+    container_name: devpulse-frontend
+    # Internal only
+    # ports:
+    #   - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    # Standard Vite dev server port
+    command: npm run dev -- --host
+
+  nginx:
+    image: nginx:alpine
+    container_name: devpulse-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:80" # Mapping host 8000 to nginx 80 (http) so "localhost:8000" works as the site
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - frontend
+      - backend-python
+      - backend-node
+
+  redis:
+    image: redis:alpine
+    container_name: devpulse-redis
+    ports:
+      - "6379:6379"
+
+  selenium-hub:
+    image: seleniarm/standalone-chromium:latest
+    container_name: devpulse-selenium
+    ports:
+      - "4444:4444"
+      - "7900:7900" 
+    shm_size: "2gb"
